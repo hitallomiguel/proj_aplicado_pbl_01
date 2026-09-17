@@ -20,21 +20,18 @@ typedef struct {
     int risco;
     int ordemEntrada;
     int ordemAtendimento;
-
 } PacienteAtendido;
-
 
 Paciente *cadastro = NULL;
 int totalPacientes = 0;
 
-
 PacienteFila *fila = NULL;
 int tamanhoFila = 0;
-int proximaOrdemEntrada = 0;
 
 PacienteAtendido *atendidos = NULL;
 int totalAtendidos = 0;
-int proximaOrdemAtendimento = 0;
+
+int relogio_eventos = 0;
 
 int cadastrar(const char *cpf, const char *nome, const char *nascimento) {
 
@@ -105,7 +102,8 @@ int dar_entrada(const char *cpf, int risco) {
 
     fila[tamanhoFila].paciente = *paciente;
     fila[tamanhoFila].risco = risco;
-    fila[tamanhoFila].ordemEntrada = proximaOrdemEntrada++;
+    fila[tamanhoFila].ordemEntrada = relogio_eventos;
+    relogio_eventos++;
 
     tamanhoFila++;
 
@@ -159,8 +157,8 @@ PacienteFila *chamar_proximo() {
     atendidos[totalAtendidos].risco = resultado->risco;
     atendidos[totalAtendidos].ordemEntrada =
         resultado->ordemEntrada;
-    atendidos[totalAtendidos].ordemAtendimento =
-        proximaOrdemAtendimento++;
+    atendidos[totalAtendidos].ordemAtendimento = relogio_eventos;
+    relogio_eventos++;
 
     totalAtendidos++;
 
@@ -229,6 +227,7 @@ int desistir(const char *cpf) {
         }
     }
 
+    relogio_eventos++;
     return 1;
 }
 
@@ -244,7 +243,6 @@ void relatorio_do_dia() {
         printf("Nenhum paciente atendido.\n");
         return;
     }
-
 
     for (int i = 0; i < totalAtendidos; i++) {
 
@@ -284,7 +282,6 @@ void relatorio_do_dia() {
         );
     }
 }
-
 
 void liberar_memoria() {
 
@@ -339,12 +336,10 @@ int main() {
     dar_entrada("333.333.333-33", 2);
     dar_entrada("444.444.444-44", 1);
 
-
     printf(
         "\nTamanho da fila: %d\n",
         tamanho_fila()
     );
-
 
     PacienteFila *proximo = chamar_proximo();
 
@@ -359,12 +354,10 @@ int main() {
         free(proximo);
     }
 
-
     printf(
         "Tamanho da fila: %d\n",
         tamanho_fila()
     );
-
 
     if (desistir("333.333.333-33")) {
 
@@ -374,7 +367,6 @@ int main() {
 
         printf("Paciente nao encontrado na fila.\n");
     }
-
 
     printf(
         "Tamanho da fila: %d\n",
@@ -393,7 +385,6 @@ int main() {
 
         free(proximo);
     }
-
 
     relatorio_do_dia();
 
